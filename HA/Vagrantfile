@@ -1,0 +1,172 @@
+require '../lib/helpers'
+
+fatal ('Unsupported platform') unless PLATFORMS.include?(platform)
+
+@network1 = '192.168.50'
+@network2 = '192.168.51'
+@network3 = '192.168.52'
+
+@hosts=Hosts.new('os.tst')
+@hosts.add('controller1', ["#{@network1}.11", "#{@network2}.11", "#{@network3}.11"])
+@hosts.add('controller2', ["#{@network1}.12", "#{@network2}.12", "#{@network3}.12"])
+@hosts.add('controller3', ["#{@network1}.13", "#{@network2}.13", "#{@network3}.13"])
+@hosts.add('compute1',    ["#{@network1}.30", "#{@network2}.30", "#{@network3}.30"])
+
+Vagrant.configure('2') do |config|
+  config.vm.define 'controller1' do |vm|
+    host = 'controller1'
+    vm.vm.box = platform
+    vm.vm.provider :libvirt do |domain|
+      domain.memory = 4069
+      domain.cpus = 2
+      domain.volume_cache = 'none'
+    end
+    @hosts.get(host).each do |ip|
+      vm.vm.network :private_network, :ip => ip
+    end
+    vm.vm.hostname = @hosts.fqdn(host)
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/pre.sh'
+      s.args = [ @hosts.to_s ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/repos.sh'
+      s.args = [ 'rhel7', openstack, openstack_version ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/opm.sh'
+      s.args = [ opm, opm_branch ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/quickstack.sh"
+      s.args = [quickstack, quickstack_branch]
+    end
+    # vm.vm.provision 'shell', path: "../common/concat.sh"
+    # vm.vm.provision 'shell', path: "../common/certificates.sh"
+    # vm.vm.provision 'shell' do |s|
+    #   s.path = "../common/vips.sh"
+    #   s.args = [ "192.168.50", "eth1" ]
+    # end
+      vm.vm.provision 'shell' do |s|
+      s.path = '../common/hiera_custom.sh'
+      s.args = [ @network1, @network2, @network3 ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/masterless.sh"
+      s.args = [ "HA_AIO_classes" ]
+    end
+  end
+
+  config.vm.define 'controller2' do |vm|
+    host = 'controller2'
+    vm.vm.box = platform
+    vm.vm.provider :libvirt do |domain|
+      domain.memory = 4069
+      domain.cpus = 2
+      domain.volume_cache = 'none'
+    end
+    @hosts.get(host).each do |ip|
+      vm.vm.network :private_network, :ip => ip
+    end
+    vm.vm.hostname = @hosts.fqdn(host)
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/pre.sh'
+      s.args = [ @hosts.to_s ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/repos.sh'
+      s.args = [ 'rhel7', openstack, openstack_version ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/opm.sh'
+      s.args = [ opm, opm_branch ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/quickstack.sh"
+      s.args = [quickstack, quickstack_branch]
+    end
+    # vm.vm.provision 'shell', path: "../common/concat.sh"
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/hiera_custom.sh'
+      s.args = [ @network1, @network2, @network3 ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/masterless.sh"
+      s.args = [ "HA_AIO_classes" ]
+    end
+  end
+
+  config.vm.define 'controller3' do |vm|
+    host = 'controller3'
+    vm.vm.box = platform
+    vm.vm.provider :libvirt do |domain|
+      domain.memory = 4069
+      domain.cpus = 2
+      domain.volume_cache = 'none'
+    end
+    @hosts.get(host).each do |ip|
+      vm.vm.network :private_network, :ip => ip
+    end
+    vm.vm.hostname = @hosts.fqdn(host)
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/pre.sh'
+      s.args = [ @hosts.to_s ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/repos.sh'
+      s.args = [ 'rhel7', openstack, openstack_version ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/opm.sh'
+      s.args = [ opm, opm_branch ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/quickstack.sh"
+      s.args = [quickstack, quickstack_branch]
+    end
+    # vm.vm.provision 'shell', path: "../common/concat.sh"
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/hiera_custom.sh'
+      s.args = [ @network1, @network2, @network3 ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/masterless.sh"
+      s.args = [ "HA_AIO_classes" ]
+    end
+  end
+
+  config.vm.define 'compute1' do |vm|
+    host = 'compute1'
+    vm.vm.box = platform
+    vm.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.cpus = 2
+      domain.volume_cache = 'none'
+    end
+    @hosts.get(host).each do |ip|
+      vm.vm.network :private_network, :ip => ip
+    end
+    vm.vm.hostname = @hosts.fqdn(host)
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/pre.sh'
+      s.args = [ @hosts.to_s ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/repos.sh'
+      s.args = [ 'rhel7', openstack, openstack_version ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/opm.sh'
+      s.args = [ opm, opm_branch ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/quickstack.sh"
+      s.args = [quickstack, quickstack_branch]
+    end
+    # vm.vm.provision 'shell', path: "../common/concat.sh"
+    vm.vm.provision 'shell' do |s|
+      s.path = "../common/masterless.sh"
+      s.args = [ "compute_classes" ]
+    end
+  end
+end
