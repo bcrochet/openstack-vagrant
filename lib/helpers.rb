@@ -11,7 +11,7 @@ def openstack
 end
 
 def openstack_version
-  ENV['OPENSTACK_VERSION'] ? ENV['OPENSTACK_VERSION'] : '5'
+  ENV['OPENSTACK_VERSION'] ? ENV['OPENSTACK_VERSION'] : '6'
 end
 
 def platform
