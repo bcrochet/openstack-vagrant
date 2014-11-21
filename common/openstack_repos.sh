@@ -24,9 +24,17 @@ case $openstack in
             rpm -ivh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
             ;;
         esac
-        ;;
       esac
     fi
+
+    case $platform in
+      rhel*)
+        echo 'Enabling RHEL Optional'
+        yum-config-manager --enable rhel-server-optional
+        echo 'Enabling RHEL Extras'
+        yum-config-manager --enable rhel-server-extras
+      ;;
+    esac
 
     yum list installed rdo-release-*
     if [[ $? -ne 0 ]]
