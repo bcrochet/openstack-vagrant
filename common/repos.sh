@@ -16,12 +16,12 @@ case $openstack in
           case $platform in
           *6)
             echo 'Adding EPEL6'
-            yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+            rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
             ;;
 
           *7)
             echo 'Adding EPEL7'
-            yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
+            rpm -ivh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
             ;;
         esac
         ;;
@@ -34,17 +34,17 @@ case $openstack in
       case $openstackversion in
         4)
           echo 'Adding RDO Havana'
-          yum -y install https://repos.fedorapeople.org/repos/openstack/openstack-havana/rdo-release-havana-9.noarch.rpm
+          rpm -ivh https://repos.fedorapeople.org/repos/openstack/openstack-havana/rdo-release-havana-9.noarch.rpm
           ;;
 
         5)
           echo 'Adding RDO Icehouse'
-          yum -y install https://repos.fedorapeople.org/repos/openstack/openstack-icehouse/rdo-release-icehouse-4.noarch.rpm
+          rpm -ivh https://repos.fedorapeople.org/repos/openstack/openstack-icehouse/rdo-release-icehouse-4.noarch.rpm
           ;;
 
         6)
           echo 'Adding RDO Juno'
-          yum -y install https://repos.fedorapeople.org/repos/openstack/openstack-juno/rdo-release-juno-1.noarch.rpm
+          rpm -ivh https://repos.fedorapeople.org/repos/openstack/openstack-juno/rdo-release-juno-1.noarch.rpm
           ;;
       esac
     fi
@@ -53,6 +53,7 @@ case $openstack in
   RHOS|rhos)
     echo "Adding RHOS"
     rpm -ivh http://team.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+    echo "========> $openstackversion"
     rhos-release $openstackversion
     ;;
   *)
