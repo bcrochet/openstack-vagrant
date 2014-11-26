@@ -41,12 +41,7 @@ Vagrant.configure('2') do |config|
       s.path = "../common/quickstack.sh"
       s.args = [quickstack, quickstack_branch]
     end
-    # vm.vm.provision 'shell', path: "../common/concat.sh"
-    # vm.vm.provision 'shell', path: "../common/certificates.sh"
-    # vm.vm.provision 'shell' do |s|
-    #   s.path = "../common/vips.sh"
-    #   s.args = [ "192.168.50", "eth1" ]
-    # end
+    # vm.vm.provision 'shell', path: '../common/certificates.sh'
       vm.vm.provision 'shell' do |s|
       s.path = '../common/hiera_custom.sh'
       s.args = [ @network1, @network2, @network3 ]
