@@ -1,5 +1,6 @@
 # EPEL Repos
 echo "Snippet EPEL repos"
+platform=$1
 
 yum list installed epel-release
 if [[ $? -ne 0 ]]
