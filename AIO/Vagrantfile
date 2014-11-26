@@ -1,0 +1,51 @@
+require '../lib/helpers'
+
+fatal ('Unsupported platform') unless PLATFORMS.include?(platform)
+
+@network1 = '192.168.60'
+@network2 = '192.168.61'
+@network3 = '192.168.62'
+
+@hosts=Hosts.new('os.tst')
+@hosts.add('aio', [ "#{@network1}.11", "#{@network2}.11", "#{@network3}.11" ])
+
+Vagrant.configure('2') do |config|
+  config.vm.define 'aio' do |vm|
+    host = 'aio'
+    vm.vm.box = platform
+    vm.vm.provider :libvirt do |domain|
+      domain.memory = 6144
+      domain.cpus = 2
+      domain.volume_cache = 'none'
+    end
+    @hosts.get(host).each do |ip|
+      vm.vm.network :private_network, :ip => ip
+    end
+    vm.vm.hostname = @hosts.fqdn(host)
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/pre.sh'
+      s.args = [ @hosts.to_s ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/openstack_repos.sh'
+      s.args = [ 'rhel7', openstack, openstack_version ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/opm.sh'
+      s.args = [ opm, opm_branch ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/quickstack.sh'
+      s.args = [ quickstack, quickstack_branch ]
+    end
+    # vm.vm.provision 'shell', path: '../common/certificates.sh'
+      vm.vm.provision 'shell' do |s|
+      s.path = '../common/hiera_custom.sh'
+      s.args = [ @network1, @network2, @network3 ]
+    end
+    vm.vm.provision 'shell' do |s|
+      s.path = '../common/masterless.sh'
+      s.args = [ 'AIO_classes' ]
+    end
+  end
+end
